@@ -21,7 +21,7 @@
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build",
     "predeploy": "npm run build",
-    "deploySrv": "npm run build && scp -r ./build/* nemirich@ninhao.nomoredomains.rocks:/home/nemirich/front-react"
+    "deployFront": "npm run build && scp -r ./build/* nemirich@ninhao.nomoredomains.rocks:/home/nemirich/frontend"
   },
   "eslintConfig": {
     "extends": [

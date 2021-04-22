@@ -1,8 +1,7 @@
 class Api {
-  constructor({ baseUrl, token, authUrl, jwt }) {
+  constructor({ baseUrl, jwt }) {
     this.baseUrl = baseUrl;
-    this._token = token;
-    this.authUrl = authUrl;
+    // this._token = token;
     this.jwt = jwt;
 
   }
@@ -10,11 +9,11 @@ class Api {
   getInitialCards() {
     return fetch(`${this.baseUrl}/cards`, {
       headers: {
-        authorization: this._token
+        // authorization: this._token
       }
     })
-    .then(response => response.ok 
-      ? response.json() 
+    .then(response => response.ok
+      ? response.json()
       : Promise.reject(`Ошибка загрузки карточек: ${response.status}`))
   }
 
@@ -22,7 +21,7 @@ class Api {
     return fetch(`${this.baseUrl}/cards`, {
       method: 'POST',
       headers: {
-        authorization: this._token,
+        // authorization: this._token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -41,7 +40,7 @@ class Api {
     return fetch(`${this.baseUrl}/users/me`, {
       method: "GET",
       headers: {
-        authorization: this._token
+        // authorization: this._token
       }
     })
     .then((res) =>
@@ -55,7 +54,7 @@ class Api {
     return fetch(`${this.baseUrl}/users/me`, {
       method: "PATCH",
       headers: {
-        authorization: this._token,
+        // authorization: this._token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -75,7 +74,7 @@ class Api {
     return fetch(`${this.baseUrl}/users/me/avatar`, {
       method: "PATCH",
       headers: {
-        authorization: this._token,
+        // authorization: this._token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -93,7 +92,7 @@ class Api {
     return fetch(`${this.baseUrl}/cards/${cardId}`, {
       method: 'DELETE',
       headers: {
-        authorization: this._token,
+        // authorization: this._token,
       }
     })
     .then((res) =>
@@ -108,7 +107,7 @@ class Api {
       return fetch(`${this.baseUrl}/cards/likes/${cardId}`, {
         method: "PUT",
         headers: {
-          authorization: this._token,
+          // authorization: this._token,
           'Content-Type': 'application/json'
         }
       })
@@ -121,7 +120,7 @@ class Api {
       return fetch(`${this.baseUrl}/cards/likes/${cardId}`, {
         method: "DELETE",
         headers: {
-          authorization: this._token,
+          // authorization: this._token,
         }
       })
       .then((res) =>
@@ -134,7 +133,7 @@ class Api {
 
 
   registration({email, password}) {
-    return fetch(`${this.authUrl}/signup`, {
+    return fetch(`${this.baseUrl}/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -144,7 +143,7 @@ class Api {
         email
       })
     })
-    .then((res) => 
+    .then((res) =>
     res.ok
       ? res.json()
       : Promise.reject(`Ошибка: ${res.status}`) //сделать как в брифе;
@@ -152,7 +151,7 @@ class Api {
   }
 
   login({email, password}) {
-    return fetch(`${this.authUrl}/signin`, {
+    return fetch(`${this.baseUrl}/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -169,12 +168,12 @@ class Api {
       )
   }
 
-  checkValidToken(token) {
-    return fetch(`${this.authUrl}/users/me`, {
+  checkValidToken() {
+    return fetch(`${this.baseUrl}/users/me`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization" : `Bearer ${token}`
+        // "Authorization" : `Bearer ${token}`
       }
     })
     .then((res) => {
@@ -187,9 +186,11 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: "https://mesto.nomoreparties.co/v1/cohort-19",
-  token: "264a260c-a5ff-4494-a8c2-9dd802b24892",
-  authUrl: "https://auth.nomoreparties.co",
+  // baseUrl: "https://mesto.nomoreparties.co/v1/cohort-19",
+  // token: "264a260c-a5ff-4494-a8c2-9dd802b24892",
+  // authUrl: "https://auth.nomoreparties.co",
+  baseUrl: "https://api.ninhao.nomoredomains.icu",
+  // baseUrl: "http://localhost:3001",
   jwt: localStorage.getItem("jwt"),
 });
 
