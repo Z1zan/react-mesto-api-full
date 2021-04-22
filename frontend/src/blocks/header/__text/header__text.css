@@ -1,0 +1,6 @@
+
+.header__text {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}

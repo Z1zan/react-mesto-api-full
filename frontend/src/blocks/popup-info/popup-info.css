@@ -1,0 +1,16 @@
+@import url('./__img/popup-info__img.css');
+
+
+.popup-info .popup__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+.popup-info .popup__title {
+  margin: 32px 36px 60px;
+  text-align: center;
+}
