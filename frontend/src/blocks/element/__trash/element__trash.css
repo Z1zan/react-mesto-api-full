@@ -4,13 +4,15 @@
   background-repeat: no-repeat;
   background-size: contain;
   padding: 0;
-  position: relative;
-  top: -351px;
-  right: -237px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
   width: 18px;
   height: 19.3px;
   border: 0;
   cursor: pointer;
+  background-color: #00000073;
+  box-shadow: 0 0 5px black;
 }
 .element__trash:hover{
   opacity: .6;

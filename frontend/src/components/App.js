@@ -1,6 +1,6 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Switch, Route, Redirect, useHistory } from 'react-router-dom';
+import {useState, useEffect} from 'react';
+import {BrowserRouter, Switch, Route, Redirect, useHistory} from 'react-router-dom';
 
 import Header from './Header';
 import Main from './Main';
@@ -13,7 +13,7 @@ import InfoToolOk from './InfoToolOk';
 import InfoToolNope from './InfoToolNope';
 import ProtectedRoute from './ProtectedRoute';
 
-import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import {CurrentUserContext} from '../contexts/CurrentUserContext';
 
 function App() {
 
@@ -74,15 +74,7 @@ function App() {
   const infoToolNopePopupOpen = `${isInfoToolNopePopupOpen ? 'popup_opened' : ''}`;
 
   const [currentUser, setCurrentUser] = useState({});
-
-  useEffect(() => {
-    api
-      .getUserInfo()
-      .then((data) => {
-        setCurrentUser(data);
-      })
-      .catch((err) => console.log(err));
-  }, [])
+  const [cards, setCards] = useState([]);
 
 
   const history = useHistory();
@@ -107,15 +99,31 @@ function App() {
   function handleLogin(item) {
     api
       .login(item)
-      .then((data) => {
-        localStorage.setItem("jwt", data.token);
+      .then(() => {
+        handelInfoToolOk();
+        localStorage.setItem("loggedIn", "true");
         setUserEmail(item.email)
-        // handelInfoToolOk();
         setLoggedIn(true);
         setTimeout(() => {
           history.push("./main");
-          // closeAllPopups();
-        }, 2000);
+          closeAllPopups();
+        }, 1500);
+      })
+      .then(() => {
+        api
+          .getUserInfo()
+          .then((data) => {
+            setCurrentUser(data);
+          })
+          .catch((err) => console.log(err))
+      })
+      .then(() => {
+        api
+          .getInitialCards()
+          .then((cards) => {
+            setCards(cards.data);
+          })
+          .catch(err => console.log(err));
       })
       .catch((err) => {
         console.log(err);
@@ -124,20 +132,36 @@ function App() {
   }
 
   function handleSignOut() {
-    localStorage.removeItem("jwt");
     setLoggedIn(false);
+    localStorage.setItem("loggedIn", "false");
     setUserEmail('');
     history.push("./signin")
   }
 
   useEffect(() => {
-    if (localStorage.jwt) {
+    if (localStorage.loggedIn === "true") {
       api
-        .checkValidToken(localStorage.jwt)
+        .checkValidToken()
         .then((item) => {
           setLoggedIn(true);
-          setUserEmail(item.data.email);
+          setUserEmail(item.email);
           history.push("./main")
+        })
+        .then(() => {
+          api
+            .getUserInfo()
+            .then((data) => {
+              setCurrentUser(data);
+            })
+            .catch((err) => console.log(err))
+        })
+        .then(() => {
+          api
+            .getInitialCards()
+            .then((cards) => {
+              setCards(cards.data);
+            })
+            .catch(err => console.log(err));
         })
         .catch((err) => {
           console.log(err);
@@ -151,6 +175,14 @@ function App() {
       .setUserInfo(item)
       .then((data) => {
         setCurrentUser(data);
+      })
+      .then(() => {
+        api
+          .getUserInfo()
+          .then((data) => {
+            setCurrentUser(data);
+          })
+          .catch((err) => console.log(err))
       })
       .then(() => {
         closeAllPopups();
@@ -167,29 +199,26 @@ function App() {
       .then(() => {
         closeAllPopups();
       })
+      .then(() => {
+        api
+          .getUserInfo()
+          .then((data) => {
+            setCurrentUser(data);
+          })
+          .catch((err) => console.log(err))
+      })
       .catch(err => console.log(err));
   }
 
 
-  const [cards, setCards] = useState([]);
-
-  useEffect(() => {
-    api
-      .getInitialCards()
-      .then((cards) => {
-        setCards(cards);
-      })
-      .catch(err => console.log(err));
-  }, [])
-
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-    
+    const isLiked = card.likes.some(i => i === currentUser._id);
+
     api
       .changeLikeCardStatus(card._id, isLiked)
-      .then((newCard) => {
-          // Формируем новый массив на основе имеющегося, подставляя в него новую карточку
-        const newCards = cards.map((c) => c._id === card._id ? newCard : c);
+      .then(({data}) => {
+        // Формируем новый массив на основе имеющегося, подставляя в него новую карточку
+        const newCards = cards.map((c) => c._id === card._id ? data : c);
 
         // Обновляем стейт
         setCards(newCards);
@@ -209,12 +238,13 @@ function App() {
   }
 
 
-
   function handleAddPlaceSubmit(card) {
+    console.log('card', card);
     api
       .createCardOne(card)
       .then(card => {
-        setCards([card, ...cards]);
+        console.log('inside', card);
+        setCards([card.data, ...cards]);
       })
       .then(() => {
         closeAllPopups();
@@ -223,61 +253,60 @@ function App() {
   }
 
 
-
   return (
-      <CurrentUserContext.Provider value={currentUser}>
-        <div className="page">
-          <Switch>
+    <CurrentUserContext.Provider value={currentUser}>
+      <div className="page">
+        <Switch>
 
-            <ProtectedRoute
-              path="/main"
-              loggedIn={loggedIn}
-              component={Main}
-              onEditAvatar={handleEditAvatarClick}
-              onEditProfile={handleEditProfileClick}
-              onAddPlace={handleAddPlaceClick}
-              onImgCard={handleCardClick}
-              cards={cards}
-              handleCardLike={handleCardLike}
-              handleCardDelete={handleCardDelete}
-              handleUpdateAvatar={handleUpdateAvatar}
-              avatarPopupOpen={avatarPopupOpen}
-              closeAllPopups={closeAllPopups}
-              handleUpdateUser={handleUpdateUser}
-              editPopupOpen={editPopupOpen}
-              handleAddPlaceSubmit={handleAddPlaceSubmit}
-              addPopupOpen={addPopupOpen}
-              selectedCard={selectedCard}
-              imgPopupOpen={imgPopupOpen}
-              userEmail={userEmail}
-              onClick={handleSignOut}
-              text={'Выйти'}
-            />
+          <ProtectedRoute
+            path="/main"
+            loggedIn={loggedIn}
+            component={Main}
+            onEditAvatar={handleEditAvatarClick}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onImgCard={handleCardClick}
+            cards={cards}
+            handleCardLike={handleCardLike}
+            handleCardDelete={handleCardDelete}
+            handleUpdateAvatar={handleUpdateAvatar}
+            avatarPopupOpen={avatarPopupOpen}
+            closeAllPopups={closeAllPopups}
+            handleUpdateUser={handleUpdateUser}
+            editPopupOpen={editPopupOpen}
+            handleAddPlaceSubmit={handleAddPlaceSubmit}
+            addPopupOpen={addPopupOpen}
+            selectedCard={selectedCard}
+            imgPopupOpen={imgPopupOpen}
+            userEmail={userEmail}
+            onClick={handleSignOut}
+            text={'Выйти'}
+          />
 
-            <Route path="/signin">
-              <Header url="/signup" text="Зарегистрироваться"/>
-              <Login onLogin={handleLogin} />
-              <InfoToolOk isOpen={infoToolOkPopupOpen} onClose={closeAllPopups}/>
-              <InfoToolNope isOpen={infoToolNopePopupOpen} onClose={closeAllPopups}/>
-            </Route>
+          <Route path="/signin">
+            <Header url="/signup" text="Зарегистрироваться"/>
+            <Login onLogin={handleLogin}/>
+            <InfoToolOk isOpen={infoToolOkPopupOpen} onClose={closeAllPopups} text={'Авторизировались'}/>
+            <InfoToolNope isOpen={infoToolNopePopupOpen} onClose={closeAllPopups}/>
+          </Route>
 
-            <Route path="/signup">
-              <Header url="/signin" text="Войти"/>
-              <Register onRegister={handleRegister} />
-              <InfoToolOk isOpen={infoToolOkPopupOpen} onClose={closeAllPopups}/>
-              <InfoToolNope isOpen={infoToolNopePopupOpen} onClose={closeAllPopups}/>
-            </Route>
+          <Route path="/signup">
+            <Header url="/signin" text="Войти"/>
+            <Register onRegister={handleRegister}/>
+            <InfoToolOk isOpen={infoToolOkPopupOpen} onClose={closeAllPopups} text={'Зарегистрировались'}/>
+            <InfoToolNope isOpen={infoToolNopePopupOpen} onClose={closeAllPopups}/>
+          </Route>
 
-            <Route exact path="/">
-              {loggedIn ? <Redirect to="/main" /> : <Redirect to="/signin"/>}
-            </Route>
+          <Route exact path="/">
+            {loggedIn ? <Redirect to="/main"/> : <Redirect to="/signin"/>}
+          </Route>
 
-          </Switch>
+        </Switch>
 
-          <Footer />
+        <Footer/>
 
-        </div>
-      </CurrentUserContext.Provider>
+      </div>
+    </CurrentUserContext.Provider>
   )
 }
 

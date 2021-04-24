@@ -11,7 +11,7 @@ function InfoToolOk(props) {
       <img className="popup-info__img" src={okImg} alt="" />
       <h2 className="popup__title">
         Вы успешно <br />
-        зарегистрировались!
+        {props.text}!
       </h2>
     </InfoTooltip>
   )

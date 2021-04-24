@@ -1,20 +1,22 @@
 class Api {
-  constructor({ baseUrl, jwt }) {
+  constructor({baseUrl}) {
     this.baseUrl = baseUrl;
     // this._token = token;
-    this.jwt = jwt;
+    // this.jwt = jwt;
 
   }
 
   getInitialCards() {
     return fetch(`${this.baseUrl}/cards`, {
-      headers: {
-        // authorization: this._token
-      }
+      method: 'GET',
+      credentials: 'include',
+      // headers: {
+      //   // authorization: this._token
+      // }
     })
-    .then(response => response.ok
-      ? response.json()
-      : Promise.reject(`Ошибка загрузки карточек: ${response.status}`))
+      .then(response => response.ok
+        ? response.json()
+        : Promise.reject(`Ошибка загрузки карточек: ${response.status}`))
   }
 
   createCardOne(data) {
@@ -24,30 +26,32 @@ class Api {
         // authorization: this._token,
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({
         name: data.name,
         link: data.link
       })
     })
-    .then((res) =>
-    res.ok
-      ? res.json()
-      : Promise.reject(`Ошибка создания карточки: ${res.status}`)
-  )
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка создания карточки: ${res.status}`)
+      )
   }
 
   getUserInfo() {
     return fetch(`${this.baseUrl}/users/me`, {
       method: "GET",
-      headers: {
-        // authorization: this._token
-      }
+      // headers: {
+      //   // authorization: this._token
+      // }
+      credentials: 'include',
     })
-    .then((res) =>
-    res.ok
-      ? res.json()
-      : Promise.reject(`Ошибка получения профиля: ${res.status}`)
-  )
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка получения профиля: ${res.status}`)
+      )
   }
 
   setUserInfo(data) {
@@ -57,17 +61,18 @@ class Api {
         // authorization: this._token,
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({
         name: data.name,
         about: data.about,
         avatar: data.avatar
       })
     })
-    .then((res) =>
-    res.ok
-      ? res.json()
-      : Promise.reject(`Ошибка изменения профиля: ${res.status}`)
-  )
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка изменения профиля: ${res.status}`)
+      )
   }
 
   setUserAvatar(link) {
@@ -77,57 +82,61 @@ class Api {
         // authorization: this._token,
         'Content-Type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({
         avatar: link.avatar
       })
     })
-    .then((res) =>
-    res.ok
-      ? res.json()
-      : Promise.reject(`Ошибка изменения профиля: ${res.status}`)
-    )
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка изменения профиля: ${res.status}`)
+      )
   }
 
   removeCard(cardId) {
     return fetch(`${this.baseUrl}/cards/${cardId}`, {
       method: 'DELETE',
-      headers: {
-        // authorization: this._token,
-      }
+      // headers: {
+      //   // authorization: this._token,
+      // }
+      credentials: 'include',
     })
-    .then((res) =>
-    res.ok
-      ? res.json()
-      : Promise.reject(`Ошибка удаления картинки: ${res.status}`)
-    )
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка удаления картинки: ${res.status}`)
+      )
   }
 
   changeLikeCardStatus(cardId, isLiked) {
-    if(isLiked == false) {
-      return fetch(`${this.baseUrl}/cards/likes/${cardId}`, {
+    if (isLiked == false) {
+      return fetch(`${this.baseUrl}/cards/${cardId}/likes`, {
         method: "PUT",
         headers: {
           // authorization: this._token,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include',
       })
-      .then((res) =>
-      res.ok
-        ? res.json()
-        : Promise.reject(`Ошибка лайка карточки: ${res.status}`)
-      )
-    } else {
-      return fetch(`${this.baseUrl}/cards/likes/${cardId}`, {
+        .then((res) =>
+          res.ok
+            ? res.json()
+            : Promise.reject(`Ошибка лайка карточки: ${res.status}`)
+        )
+    } else if (isLiked == true) {
+      return fetch(`${this.baseUrl}/cards/${cardId}/likes`, {
         method: "DELETE",
-        headers: {
-          // authorization: this._token,
-        }
+        // headers: {
+        //   // authorization: this._token,
+        // }
+        credentials: 'include',
       })
-      .then((res) =>
-      res.ok
-        ? res.json()
-        : Promise.reject(`Ошибка дизлайка карточки: ${res.status}`)
-      )
+        .then((res) =>
+          res.ok
+            ? res.json()
+            : Promise.reject(`Ошибка дизлайка карточки: ${res.status}`)
+        )
     }
   }
 
@@ -138,34 +147,40 @@ class Api {
       headers: {
         "Content-Type": "application/json"
       },
+      credentials: 'include',
       body: JSON.stringify({
         password,
         email
       })
     })
-    .then((res) =>
-    res.ok
-      ? res.json()
-      : Promise.reject(`Ошибка: ${res.status}`) //сделать как в брифе;
-    )
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка: ${res.status}`) //сделать как в брифе;
+      )
   }
 
   login({email, password}) {
     return fetch(`${this.baseUrl}/signin`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        // "Access-Control-Allow-Origin": "*",
       },
+      credentials: 'include',
       body: JSON.stringify({
         password,
         email
       })
     })
-    .then((res) =>
-      res.ok
-        ? res.json()
-        : Promise.reject(`Ошибка: ${res.status}`)
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка: ${res.status}`)
       )
+    // .then((token) => {
+    //   document.cookie = `AUTH_API=${token}`;
+    // })
   }
 
   checkValidToken() {
@@ -174,14 +189,14 @@ class Api {
       headers: {
         "Content-Type": "application/json",
         // "Authorization" : `Bearer ${token}`
-      }
+      },
+      credentials: 'include',
     })
-    .then((res) => {
-      if(res.ok) {
-        res.json()
-      }
-      return Promise.reject(`Ошибка: ${res.status}`); ///////////////////
-    })
+      .then((res) =>
+        res.ok
+          ? res.json()
+          : Promise.reject(`Ошибка: ${res.status}`)
+      )
   }
 }
 
@@ -191,7 +206,7 @@ const api = new Api({
   // authUrl: "https://auth.nomoreparties.co",
   baseUrl: "https://api.ninhao.nomoredomains.icu",
   // baseUrl: "http://localhost:3001",
-  jwt: localStorage.getItem("jwt"),
+  // jwt: localStorage.getItem("jwt"),
 });
 
 export default api;
