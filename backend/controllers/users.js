@@ -7,6 +7,7 @@ const AuthError = require('../errors/authError');
 const ExistingMailError = require('../errors/existingMailError');
 const IncorrectValueError = require('../errors/incorrectValueError');
 const NotFoundError = require('../errors/notFoundError');
+const secret = process.env;
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -144,7 +145,7 @@ module.exports.login = (req, res, next) => {
           if (!matched) {
             throw new ExistingMailError('Неправильная почта или пароль');
           }
-          const token = jwt.sign({_id: user._id}, 'super-strong-secret', {expiresIn: '7d'});
+          const token = jwt.sign({_id: user._id}, secret.JWT_SECRET, {expiresIn: '7d'});
           return res.cookie(
             'jwt',
             token,
