@@ -7,6 +7,7 @@ const path = require('path');
 const { celebrate, Joi } = require('celebrate');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+require('dotenv').config();
 
 const { createUser, login } = require('./controllers/users');
 
