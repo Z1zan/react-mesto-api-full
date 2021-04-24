@@ -147,6 +147,7 @@ class Api {
       headers: {
         "Content-Type": "application/json",
       },
+      mode: "cors",
       credentials: 'include',
       body: JSON.stringify({
         password,
@@ -158,6 +159,7 @@ class Api {
           ? res.json()
           : Promise.reject(`Ошибка: ${res.status}`)
       )
+      // .then((res) => console.log(res));
   }
 
   checkValidToken() {
