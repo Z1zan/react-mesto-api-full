@@ -22,38 +22,29 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 const app = express();
 
-app.use((req, res, next) => {
-    res.append('Access-Control-Allow-Origin', ['*']);
-    res.append('Access-Control-Expose-Headers', 'Set-Cookie');
-    res.append('Access-Control-Allow-Credentials', 'true');
-    res.append('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
-    res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Set-Cookie');
-    next();
-})
+// const corsWhiteList = [
+//   'https://ninhao.nomoredomains.rocks',
+//   'http://ninhao.nomoredomains.rocks',
+//   'http://localhost:3000',
+// ];
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     if (corsWhiteList.indexOf(origin) !== -1) {
+//       callback(null, true);
+//     }
+//   },
+//   credentials: true,
+// };
+// app.use(cors(corsOptions));
 
-const corsWhiteList = [
-  'https://ninhao.nomoredomains.rocks',
-  'http://ninhao.nomoredomains.rocks',
-  'http://localhost:3000',
-];
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (corsWhiteList.indexOf(origin) !== -1) {
-      callback(null, true);
-    }
-  },
-  credentials: true,
-};
-app.use(cors(corsOptions));
-
-// app.use(cors({
-//     origin: [
-//         'https://ninhao.nomoredomains.rocks',
-//         'http://ninhao.nomoredomains.rocks',
-//         'http://localhost:3000',
-//     ],
-//     credentials: true,
-// }));
+app.use(cors({
+    origin: [
+        'https://ninhao.nomoredomains.rocks',
+        'http://ninhao.nomoredomains.rocks',
+        'http://localhost:3000',
+    ],
+    credentials: true,
+}));
 // app.use(cors());
 // app.options('*', cors());
 
