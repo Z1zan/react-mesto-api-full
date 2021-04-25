@@ -159,7 +159,6 @@ class Api {
           ? res.json()
           : Promise.reject(`Ошибка: ${res.status}`)
       )
-      // .then((res) => console.log(res));
   }
 
   checkValidToken() {

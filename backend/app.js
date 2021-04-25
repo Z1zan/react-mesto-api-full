@@ -3,14 +3,15 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const path = require('path');
 const { celebrate, Joi } = require('celebrate');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 require('dotenv').config();
+const NotFoundError = require('./errors/notFoundError');
 
 const { createUser, login } = require('./controllers/users');
 
+// eslint-disable-next-line no-undef
 const { PORT = 3000 } = process.env;
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -51,7 +52,6 @@ app.use(cors({
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(requestLogger);
 
@@ -90,8 +90,8 @@ app.use('/cards', auth, require('./routes/cards'));
 
 app.use(errorLogger);
 
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
 });
 
 // eslint-disable-next-line no-unused-vars

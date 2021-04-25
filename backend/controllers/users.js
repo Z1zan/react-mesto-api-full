@@ -7,6 +7,7 @@ const AuthError = require('../errors/authError');
 const ExistingMailError = require('../errors/existingMailError');
 const IncorrectValueError = require('../errors/incorrectValueError');
 const NotFoundError = require('../errors/notFoundError');
+// eslint-disable-next-line no-undef
 const secret = process.env;
 
 module.exports.getUsers = (req, res, next) => {
@@ -55,7 +56,13 @@ module.exports.createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res.send({data: user}))
+        .then((user) => res.send({
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+        }))
         .catch((err) => {
           if (err.name === 'ValidationError') {
             next(new IncorrectValueError('Переданы некорректные данные при создании пользователя.'));
@@ -131,6 +138,8 @@ module.exports.updateUserAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const {email, password} = req.body;
+  console.log('email', email);
+  console.log('password', password);
 
   if (!email || !password) {
     throw new AuthError('Не заполнены все поля');
@@ -143,23 +152,33 @@ module.exports.login = (req, res, next) => {
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new ExistingMailError('Неправильная почта или пароль');
+            throw new AuthError('Неправильная почта или пароль');
           }
-          const token = jwt.sign({_id: user._id}, secret.JWT_SECRET, {expiresIn: '7d'});
+          const token = jwt.sign(
+            {
+              _id: user._id
+            },
+            secret.JWT_SECRET,
+            {expiresIn: '7d'},
+          );
           return res.cookie(
             'jwt',
             token,
             {
               maxAge: 3600000,
               httpOnly: true,
-              // sameSite: 'none',
-              // secure
+              sameSite: 'none',
+              secure,
             },
           ).send({message: 'Аутентификация прошла успешно!'});
         });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      console.log('err', err);
+      console.log('err.name', err.name);
+      console.log('err.message', err.message);
+      // if (err.name === 'ValidationError') {
+      if (err.message.includes('Illegal arguments')) {
         next(new IncorrectValueError('Введены не коректные данные'));
       }
       next(err);
