@@ -138,12 +138,11 @@ module.exports.updateUserAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const {email, password} = req.body;
-  console.log('email', email);
-  console.log('password', password);
 
   if (!email || !password) {
-    throw new AuthError('Не заполнены все поля');
+    throw new IncorrectValueError('Не заполнены все поля');
   }
+
   User.findOne({email}).select('+password')
     .then((user) => {
       if (!user) {
@@ -158,7 +157,9 @@ module.exports.login = (req, res, next) => {
             {
               _id: user._id
             },
-            secret.JWT_SECRET,
+            secret.NODE_ENV === 'production'
+              ? secret.JWT_SECRET
+              : 'dev-secret',
             {expiresIn: '7d'},
           );
           return res.cookie(
@@ -174,13 +175,10 @@ module.exports.login = (req, res, next) => {
         });
     })
     .catch((err) => {
-      console.log('err', err);
-      console.log('err.name', err.name);
-      console.log('err.message', err.message);
-      // if (err.name === 'ValidationError') {
-      if (err.message.includes('Illegal arguments')) {
+      if (err.name === 'ValidationError') {
         next(new IncorrectValueError('Введены не коректные данные'));
       }
+      console.log(err);
       next(err);
     });
 };

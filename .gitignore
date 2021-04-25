@@ -40,3 +40,4 @@ yarn-error.log*
 backend/.env
 backend/*.log
 frontend/build
+backend/request.log 
