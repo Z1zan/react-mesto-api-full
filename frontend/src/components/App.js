@@ -239,11 +239,9 @@ function App() {
 
 
   function handleAddPlaceSubmit(card) {
-    console.log('card', card);
     api
       .createCardOne(card)
       .then(card => {
-        console.log('inside', card);
         setCards([card.data, ...cards]);
       })
       .then(() => {
