@@ -39,12 +39,12 @@ const app = express();
 // app.use(cors(corsOptions));
 
 app.use(cors({
-    origin: [
-        'https://ninhao.nomoredomains.rocks',
-        'http://ninhao.nomoredomains.rocks',
-        'http://localhost:3000',
-    ],
-    credentials: true,
+  origin: [
+    'https://ninhao.nomoredomains.rocks',
+    'http://ninhao.nomoredomains.rocks',
+    'http://localhost:3000',
+  ],
+  credentials: true,
 }));
 // app.use(cors());
 // app.options('*', cors());

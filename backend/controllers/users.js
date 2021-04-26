@@ -13,12 +13,12 @@ const secret = process.env;
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .populate('user')
-    .then((users) => res.send({data: users}))
+    .then((users) => res.send({ data: users }))
     .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
-  const {userId} = req.params;
+  const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
       if (!user) {
@@ -82,9 +82,9 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.updateUserInfo = (req, res, next) => {
   const userId = req.user._id;
-  const {name, about} = req.body;
+  const { name, about } = req.body;
 
-  User.findByIdAndUpdate(userId, {name, about})
+  User.findByIdAndUpdate(userId, { name, about })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
@@ -119,14 +119,14 @@ module.exports.getUserInfo = (req, res, next) => {
 
 module.exports.updateUserAvatar = (req, res, next) => {
   const userId = req.user._id;
-  const {avatar} = req.body;
+  const { avatar } = req.body;
 
-  User.findByIdAndUpdate(userId, {avatar})
+  User.findByIdAndUpdate(userId, { avatar })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
       }
-      res.send({data: user});
+      res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -137,13 +137,13 @@ module.exports.updateUserAvatar = (req, res, next) => {
 };
 
 module.exports.login = (req, res, next) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
     throw new IncorrectValueError('Не заполнены все поля');
   }
 
-  User.findOne({email}).select('+password')
+  User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         throw new ExistingMailError('Неправильная почта или пароль');
@@ -155,12 +155,12 @@ module.exports.login = (req, res, next) => {
           }
           const token = jwt.sign(
             {
-              _id: user._id
+              _id: user._id,
             },
             secret.NODE_ENV === 'production'
               ? secret.JWT_SECRET
               : 'dev-secret',
-            {expiresIn: '7d'},
+            { expiresIn: '7d' },
           );
           return res.cookie(
             'jwt',
@@ -171,14 +171,13 @@ module.exports.login = (req, res, next) => {
               // sameSite: 'none',
               // secure,
             },
-          ).send({message: 'Аутентификация прошла успешно!'});
+          ).send({ message: 'Аутентификация прошла успешно!' });
         });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new IncorrectValueError('Введены не коректные данные'));
       }
-      console.log(err);
       next(err);
     });
 };
