@@ -4,3 +4,9 @@
   flex-direction: row-reverse;
   align-items: center;
 }
+
+@media screen and (max-width: 881px) {
+  .header__text {
+    padding-right: 27px;
+  }
+}
