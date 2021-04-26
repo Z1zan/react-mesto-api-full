@@ -146,7 +146,7 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new ExistingMailError('Неправильная почта или пароль');
+        throw new AuthError('Неправильная почта или пароль');
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
@@ -169,7 +169,7 @@ module.exports.login = (req, res, next) => {
               maxAge: 3600000,
               httpOnly: true,
               // sameSite: 'none',
-              // secure,
+              // secure: true,
             },
           ).send({ message: 'Аутентификация прошла успешно!' });
         });
